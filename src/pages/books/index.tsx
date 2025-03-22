@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuthFetch } from "@/hooks/useAuthFetch";
 
 interface Book {
     id: string;
@@ -14,17 +15,19 @@ interface Book {
 }
 
 export default function BookList() {
+    const { fetchWithAuth } = useAuthFetch();
+    
     const [books, setBooks] = useState<Book[] | null>(null);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [hasMore, setHasMore] = useState(true);
-
+    
     const fetchBooks = useCallback(() => {
         const apiUrl = `${import.meta.env.VITE_API_URL}/books?search=${search}&page=${page}&size=${pageSize}`;
         console.log("query: " + search + " page: " + page + " size: " + pageSize)
 
-        fetch(apiUrl, { credentials: "include" })
+        fetchWithAuth(apiUrl, { credentials: "include" })
             .then((res) => res.json())
             .then((data) => {
                 setBooks(data.data.length > 0 ? data.data : null);
@@ -34,7 +37,7 @@ export default function BookList() {
                 console.error("Error fetching books:", err);
                 setBooks(null);
             });
-    }, [search, page, pageSize]);
+    }, [search, page, pageSize, fetchWithAuth]);
 
     useEffect(() => {
         setPage(1)
