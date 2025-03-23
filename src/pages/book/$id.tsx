@@ -4,17 +4,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { BookPagePlaceholder } from "../books/bookPlaceholder";
 import { Button } from "@/components/ui/button";
+import CommentSection from "./comments";
 
 interface Book {
     id: string;
     title: string;
-    author: string;
     description: string;
     introduction: string;
+    author: string;
     release_date: string;
-    price: number;
     image: string;
+    file: string;
+    price: number;
 }
+
+const BookImage = ({ src, title, author }: { src: string, title: string; author: string }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    return (
+        <div className="relative w-full h-96 border border-gray-300 rounded-lg shadow-md flex-shrink-0">
+            {!imageLoaded && <BookPagePlaceholder title={title} author={author} />}
+            <img
+                src={src}
+                alt={title}
+                className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
+                    }`}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(false)}
+            />
+        </div>
+    );
+};
 
 const BookDetail = () => {
     const { id } = useParams<{ id: string }>();
@@ -23,51 +43,19 @@ const BookDetail = () => {
     const [loading, setLoading] = useState(true);
 
     const fetchBook = useCallback(() => {
-        const apiUrl = `${import.meta.env.VITE_API_URL}/books/${id}`;
-
-        fetchWithAuth(apiUrl, { credentials: "include" })
-            .then((res) => res.json())
-            .then((data) => {
-                setBook(data.data)
-            })
-            .catch((err) => {
-                console.error("Error fetching books:", err);
-                setBook(null)
-            })
-            .finally(() => {
-                setLoading(false)
-            });
+        fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/${id}`)
+            .then(res => res.json())
+            .then(data => setBook(data.data))
+            .catch(err => console.error("Error fetching book:", err))
+            .finally(() => setLoading(false));
     }, [id, fetchWithAuth]);
-
-    const BookImage = ({ src, title, author }: { src: string, title: string; author: string }) => {
-        const [imageLoaded, setImageLoaded] = useState(false);
-
-        return (
-            <div className="relative w-full h-96 border border-gray-300 rounded-lg shadow-md flex-shrink-0">
-                {!imageLoaded && <BookPagePlaceholder title={title} author={author} />}
-                <img
-                    src={src}
-                    alt={title}
-                    className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
-                        }`}
-                    onLoad={() => setImageLoaded(true)}
-                    onError={() => setImageLoaded(false)}
-                />
-            </div>
-        );
-    };
 
     useEffect(() => {
         fetchBook();
     }, [fetchBook]);
 
-    if (loading) {
-        return <p className="text-center text-gray-500">Loading...</p>;
-    }
-
-    if (!book) {
-        return <p className="text-center text-gray-500">Book not found.</p>;
-    }
+    if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+    if (!book) return <p className="text-center text-gray-500">Book not found.</p>;
 
     return (
         <div className="max-w-5xl mx-auto p-6">
@@ -108,11 +96,8 @@ const BookDetail = () => {
                 </CardContent>
             </Card>
 
-            {/* Comments and Reviews */}
-            <div className="mt-6 p-6 bg-gray-100 rounded-lg">
-                <h2 className="text-xl font-semibold mb-4">Comments & Reviews</h2>
-                <p className="text-gray-500">Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
-            </div>
+            {/* Comment Section */}
+            <CommentSection bookId={book.id} />
         </div>
     );
 };
