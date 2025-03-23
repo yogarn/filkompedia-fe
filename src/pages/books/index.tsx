@@ -1,28 +1,32 @@
 import { useState, useEffect, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
+import BookPlaceholder from "./bookPlaceholder";
 
 interface Book {
     id: string;
     title: string;
     description: string;
+    introduction: string;
     author: string;
     release_date: string;
+    image: string;
+    file: string;
     price: number;
 }
 
 export default function BookList() {
     const { fetchWithAuth } = useAuthFetch();
-    
+
     const [books, setBooks] = useState<Book[] | null>(null);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(9);
     const [hasMore, setHasMore] = useState(true);
-    
+
     const fetchBooks = useCallback(() => {
         const apiUrl = `${import.meta.env.VITE_API_URL}/books?search=${search}&page=${page}&size=${pageSize}`;
         console.log("query: " + search + " page: " + page + " size: " + pageSize)
@@ -30,14 +34,37 @@ export default function BookList() {
         fetchWithAuth(apiUrl, { credentials: "include" })
             .then((res) => res.json())
             .then((data) => {
-                setBooks(data.data.length > 0 ? data.data : null);
-                setHasMore(data.data.length > 0);
+                if (Array.isArray(data.data)) {
+                    setBooks(data.data);
+                    setHasMore(data.data.length > 0);
+                } else {
+                    setBooks([]);
+                    setHasMore(false);
+                }
             })
             .catch((err) => {
                 console.error("Error fetching books:", err);
-                setBooks(null);
+                setBooks([]);
             });
     }, [search, page, pageSize, fetchWithAuth]);
+
+    const BookImage = ({ src, title, author }: { src: string, title: string; author: string }) => {
+        const [imageLoaded, setImageLoaded] = useState(false);
+
+        return (
+            <div className="relative w-32 h-48 border border-gray-300 rounded-lg shadow-md flex-shrink-0">
+                {!imageLoaded && <BookPlaceholder title={title} author={author} />}
+                <img
+                    src={src}
+                    alt={title}
+                    className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
+                        }`}
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageLoaded(false)}
+                />
+            </div>
+        );
+    };
 
     useEffect(() => {
         setPage(1)
@@ -63,27 +90,31 @@ export default function BookList() {
             </div>
 
             {/* Books Grid */}
-            {books === null ? (
+            {books === null || books.length === 0 ? (
                 <div className="flex justify-center items-center w-full h-full">
-                    <p className="text-gray-500 text-center">That's all for now. Try search something else!</p>
+                    <p className="text-gray-500 text-center">That's all for now. Try searching for something else!</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-5xl">
-
-                    {books.map((book) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+                    {books?.map((book) => (
                         <Card key={book.id} className="shadow-md">
-                            <CardHeader>
-                                <CardTitle>{book.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-gray-600">{book.description}</p>
-                                <p className="text-sm text-gray-500 mt-2">Author: {book.author}</p>
-                                <p className="text-sm text-gray-500">
-                                    Release: {new Date(book.release_date).toDateString()}
-                                </p>
-                                <p className="text-lg font-semibold mt-2">
-                                    Price: Rp {book.price.toLocaleString()}
-                                </p>
+                            <CardContent className="flex items-start space-x-4">
+                                {/* Book Image (Left Side) */}
+                                {book.image ? (
+                                    <BookImage src={book.image} title={book.title} author={book.author} />
+                                ) : (
+                                    <BookPlaceholder title={book.title} author={book.author} />
+                                )}
+
+
+                                {/* Book Details (Right Side) */}
+                                <div className="flex flex-col">
+                                    <CardTitle>{book.title}</CardTitle>
+                                    <p className="text-gray-600 text-sm mt-1">{book.description}</p>
+                                    <p className="text-sm text-gray-500 mt-2">Author: {book.author}</p>
+                                    <p className="text-sm text-gray-500">Release: {new Date(book.release_date).toDateString()}</p>
+                                    <p className="text-lg font-semibold mt-2">Price: Rp {book.price.toLocaleString()}</p>
+                                </div>
                             </CardContent>
                         </Card>
                     ))}
@@ -97,7 +128,7 @@ export default function BookList() {
                         <SelectValue placeholder={`Show ${pageSize} items`} />
                     </SelectTrigger>
                     <SelectContent className="text-sm">
-                        {[10, 20, 30].map(size => (
+                        {[9, 18, 27].map(size => (
                             <SelectItem key={size} value={size.toString()}>Show {size} items</SelectItem>
                         ))}
                     </SelectContent>

@@ -4,16 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setError("");
 
     try {
       const response = await axios.post(
@@ -27,7 +26,7 @@ export default function LoginForm() {
       }
     } catch (err: any) {
       console.log(err);
-      setError(err.response?.data?.message || "Login failed.");
+      toast.error(err.response?.data?.message || "Login failed.");
     }
   };
 
@@ -54,6 +53,7 @@ export default function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="border border-gray-300"
+              required
             />
             <Input
               type="password"
@@ -61,8 +61,9 @@ export default function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="border border-gray-300"
+              minLength={8}
+              required
             />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button type="submit" className="w-full mb-6">Login</Button>
           </form>
           <p className="text-sm text-center mt-2">

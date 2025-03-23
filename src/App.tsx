@@ -4,6 +4,7 @@ import {
   LoaderFunction,
   ActionFunction,
 } from "react-router-dom";
+import { Toaster } from "sonner";
 
 interface RouteCommon {
   loader?: LoaderFunction;
@@ -11,7 +12,7 @@ interface RouteCommon {
   ErrorBoundary?: React.ComponentType<any>;
 }
 
-interface IRoute extends RouteCommon{
+interface IRoute extends RouteCommon {
   path: string;
   Element: React.ComponentType<any>;
 }
@@ -53,7 +54,12 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <Toaster position="top-right" />
+      <RouterProvider router={router} />
+    </>
+  )
 };
 
 export default App;

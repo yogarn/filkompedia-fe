@@ -4,19 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const response = await axios.post(
@@ -29,10 +28,10 @@ export default function LoginForm() {
       }
     } catch (err: any) {
       console.log(err);
-      setError(err.response?.data?.message || "Register failed.");
+      toast.error(err.response?.data?.message || "Register failed.");
     } finally {
       setLoading(false);
-      navigate("/verify-otp");
+      navigate(`/verify-otp?email=${encodeURIComponent(email)}`);
     }
   };
 
@@ -79,7 +78,6 @@ export default function LoginForm() {
               required
               className="border border-gray-300"
             />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button type="submit" className="w-full mb-6" disabled={loading}>
               {loading ? "Registering..." : "Register"}
             </Button>
