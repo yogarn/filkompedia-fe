@@ -32,9 +32,14 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center min-h-screen bg-gray-200 space-y-6 md:space-y-0 md:space-x-12 p-6">
-      {/* FilkomPedia Title */}
-      <h1 className="text-4xl font-bold">FilkomPedia</h1>
+    <div className="flex flex-col md:flex-row justify-center items-center min-h-screen bg-gray-200 space-y-6 md:space-y-0 md:space-x-20 p-6">
+      {/* FilkomPedia Title and Description */}
+      <div className="text-center md:text-left max-w-md">
+        <h1 className="text-4xl font-bold">FilkomPedia</h1>
+        <p className="mt-2 text-zinc-600">
+          Good to see you back! Dive into new stories, revisit old favorites, and let every page take you on a new adventure. Your next great read is just a click away!
+        </p>
+      </div>
 
       {/* Login Form */}
       <Card className="w-96 shadow-lg rounded-lg p-4 bg-gray-100">
@@ -45,7 +50,7 @@ export default function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               type="email"
-              placeholder="email"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="border border-gray-300"
@@ -58,8 +63,11 @@ export default function LoginForm() {
               className="border border-gray-300"
             />
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <Button type="submit" className="w-full">Login</Button>
+            <Button type="submit" className="w-full mb-6">Login</Button>
           </form>
+          <p className="text-sm text-center mt-2">
+            Don't have an account yet? <a href="/register" className="text-blue-500">Register here!</a>
+          </p>
         </CardContent>
       </Card>
     </div>
