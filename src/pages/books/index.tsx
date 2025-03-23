@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
-import BookPlaceholder from "./bookPlaceholder";
+import { Link } from "react-router-dom";
+import { BookPlaceholder } from "./bookPlaceholder";
 
 interface Book {
     id: string;
@@ -97,7 +98,8 @@ export default function BookList() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
                     {books?.map((book) => (
-                        <Card key={book.id} className="shadow-md">
+                        <Link to={`/book/${book.id}`} key={book.id} className="no-underline">
+                        <Card className="shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                             <CardContent className="flex items-start space-x-4">
                                 {/* Book Image (Left Side) */}
                                 {book.image ? (
@@ -111,12 +113,15 @@ export default function BookList() {
                                 <div className="flex flex-col">
                                     <CardTitle>{book.title}</CardTitle>
                                     <p className="text-gray-600 text-sm mt-1">{book.description}</p>
-                                    <p className="text-sm text-gray-500 mt-2">Author: {book.author}</p>
-                                    <p className="text-sm text-gray-500">Release: {new Date(book.release_date).toDateString()}</p>
-                                    <p className="text-lg font-semibold mt-2">Price: Rp {book.price.toLocaleString()}</p>
+
+                                    <p className="text-sm text-gray-500 mt-2">{book.author}</p>
+                                    <p className="text-sm text-gray-500">{new Date(book.release_date).toLocaleString("en-US", { month: "long", year: "numeric" })}</p>
+                                    
+                                    <p className="text-base font-semibold mt-2">{book.price.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</p>
                                 </div>
                             </CardContent>
                         </Card>
+                        </Link>
                     ))}
                 </div>
             )}
