@@ -2,12 +2,12 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package.json .
+COPY package.json package-lock.json ./
 
 RUN npm install
 
 COPY . .
 
-EXPOSE 8080
+EXPOSE 5173
 
-CMD [ "npm", "run", "dev" ]
+CMD ["npm", "run", "dev", "--", "--host"]
