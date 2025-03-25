@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import CommentSection from "./comments";
 import { toast } from "sonner";
 import { Minus, Plus } from "lucide-react";
+import { NavBar } from "@/navbar";
 
 interface Book {
     id: string;
@@ -47,12 +48,17 @@ const BookDetail = () => {
     const [addingToCart, setAddingToCart] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
-    const fetchBook = useCallback(() => {
-        fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/${id}`)
-            .then(res => res.json())
-            .then(data => setBook(data.data))
-            .catch(err => console.error("Error fetching book:", err))
-            .finally(() => setLoading(false));
+    const fetchBook = useCallback(async () => {
+        try {
+            const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/${id}`);
+            const data = await res.json();
+            if (res.ok) setBook(data.data);
+            else setBook(null)
+        } catch (err) {
+            console.error("Error fetching book:", err);
+        } finally {
+            setLoading(false);
+        }
     }, [id, fetchWithAuth]);
 
     const handleAddToCart = async () => {
@@ -78,66 +84,80 @@ const BookDetail = () => {
 
     useEffect(() => {
         fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/me`)
-        .then(res => res.json())
-        .then(data => setCurrentUserId(data.data.id))
-        .catch(err => console.error("Error fetching user:", err));
+            .then(res => res.json())
+            .then(data => setCurrentUserId(data.data.id))
+            .catch(err => console.error("Error fetching user:", err));
 
         fetchBook();
     }, [fetchBook, fetchWithAuth]);
 
-    if (loading) return <p className="text-center text-gray-500">Loading...</p>;
-    if (!book) return <p className="text-center text-gray-500">Book not found.</p>;
+    if (loading) return <p className="text-center text-gray-500"></p>;
+
+    if (!book) {
+        return (
+            <div className="flex flex-col items-center p-6 space-y-4 w-full">
+                <div className="flex justify-center items-center w-full h-full">
+                    <p className="text-gray-700 text-center">You caught us! Try searching for something else!</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="max-w-5xl mx-auto p-6">
-            <Card className="shadow-md mt-10">
-                <CardContent className="grid grid-cols-3 gap-6 p-6">
-                    {/* Book Cover */}
-                    <div className="col-span-1">
-                        {book.image ? (
-                            <BookImage src={book.image} title={book.title} author={book.author} />
-                        ) : (
-                            <BookPagePlaceholder title={book.title} author={book.author} />
-                        )}
-                        <h1 className="text-2xl font-bold mt-4">{book.title}</h1>
-                        <p className="text-gray-600 text-sm">by {book.author}</p>
-                        <p className="text-gray-500">
-                            {new Date(book.release_date).toLocaleString("en-US", {
-                                month: "long",
-                                year: "numeric",
-                            })}
-                        </p>
-                    </div>
-
-                    {/* Book Details */}
-                    <div className="col-span-2">
-                        <p className="text-gray-700"><a href="/books">&larr; Find another book</a></p>
-                        <p className="text-gray-700 text-lg font-bold">{book.description}</p>
-                        <p className="text-gray-700 mt-1">{book.introduction}</p>
-                        <div className="flex justify-between items-center mt-4">
-                            <p className="text-xl font-bold text-gray-800">
-                                {book.price.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+        <>
+            <div className="flex flex-col items-center pt-6 space-y-4 w-full">
+                <NavBar />
+            </div>
+            <div className="max-w-5xl mx-auto p-6">
+                <Card className="shadow-md">
+                    <CardContent className="grid grid-cols-3 gap-6 p-6">
+                        {/* Book Cover */}
+                        <div className="col-span-1">
+                            {book.image ? (
+                                <BookImage src={book.image} title={book.title} author={book.author} />
+                            ) : (
+                                <BookPagePlaceholder title={book.title} author={book.author} />
+                            )}
+                            <h1 className="text-2xl font-bold mt-4">{book.title}</h1>
+                            <p className="text-gray-600 text-sm">by {book.author}</p>
+                            <p className="text-gray-500">
+                                {new Date(book.release_date).toLocaleString("en-US", {
+                                    month: "long",
+                                    year: "numeric",
+                                })}
                             </p>
-                            <div className="flex gap-4">
-                                <div className="flex items-center border border-gray-300 rounded-md px-2 py-1">
-                                    <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="p-2"><Minus size={16} /></button>
-                                    <span className="px-4 text-lg font-semibold">{quantity}</span>
-                                    <button onClick={() => setQuantity(prev => prev + 1)} className="p-2"><Plus size={16} /></button>
-                                </div>
-                                <Button className="h-auto px-6 py-2 bg-gray-500 text-white" onClick={handleAddToCart} disabled={addingToCart}>
-                                    {addingToCart ? "Adding..." : "Add to Cart"}
-                                </Button>
-                                <Button className="h-auto px-6 py-2 bg-gray-800 text-white">Buy Now</Button>
+                        </div>
 
+                        {/* Book Details */}
+                        <div className="col-span-2">
+                            <p className="text-gray-700"><a href="/books">&larr; Find another book</a></p>
+                            <p className="text-gray-700 text-lg font-bold">{book.description}</p>
+                            <p className="text-gray-700 mt-1">{book.introduction}</p>
+                            <div className="flex justify-between items-center mt-4">
+                                <p className="text-xl font-bold text-gray-800">
+                                    {book.price.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+                                </p>
+                                <div className="flex gap-4">
+                                    <div className="flex items-center border border-gray-300 rounded-md px-2 py-1">
+                                        <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="p-2"><Minus size={16} /></button>
+                                        <span className="px-4 text-lg font-semibold">{quantity}</span>
+                                        <button onClick={() => setQuantity(prev => prev + 1)} className="p-2"><Plus size={16} /></button>
+                                    </div>
+                                    <Button className="h-auto px-6 py-2 bg-gray-500 text-white" onClick={handleAddToCart} disabled={addingToCart}>
+                                        {addingToCart ? "Adding..." : "Add to Cart"}
+                                    </Button>
+                                    <Button className="h-auto px-6 py-2 bg-gray-800 text-white">Buy Now</Button>
+
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
 
-            {/* Comment Section */}
-            <CommentSection bookId={book.id} />
-        </div>
+                {/* Comment Section */}
+                <CommentSection bookId={book.id} />
+            </div>
+        </>
     );
 };
 

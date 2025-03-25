@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { Link } from "react-router-dom";
 import { BookPlaceholder } from "./bookPlaceholder";
+import { NavBar } from "@/navbar";
 
 interface Book {
     id: string;
@@ -30,7 +31,6 @@ export default function BookList() {
 
     const fetchBooks = useCallback(() => {
         const apiUrl = `${import.meta.env.VITE_API_URL}/books?search=${search}&page=${page}&size=${pageSize}`;
-        console.log("query: " + search + " page: " + page + " size: " + pageSize)
 
         fetchWithAuth(apiUrl, { credentials: "include" })
             .then((res) => res.json())
@@ -77,6 +77,7 @@ export default function BookList() {
 
     return (
         <div className="flex flex-col items-center p-6 space-y-4 w-full">
+            <NavBar />
             <h1 className="text-2xl font-bold">FilkomPedia</h1>
 
             {/* Search Input and Button */}
@@ -99,28 +100,28 @@ export default function BookList() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
                     {books?.map((book) => (
                         <Link to={`/book/${book.id}`} key={book.id} className="no-underline">
-                        <Card className="shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
-                            <CardContent className="flex items-start space-x-4">
-                                {/* Book Image (Left Side) */}
-                                {book.image ? (
-                                    <BookImage src={book.image} title={book.title} author={book.author} />
-                                ) : (
-                                    <BookPlaceholder title={book.title} author={book.author} />
-                                )}
+                            <Card className="shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
+                                <CardContent className="flex items-start space-x-4">
+                                    {/* Book Image (Left Side) */}
+                                    {book.image ? (
+                                        <BookImage src={book.image} title={book.title} author={book.author} />
+                                    ) : (
+                                        <BookPlaceholder title={book.title} author={book.author} />
+                                    )}
 
 
-                                {/* Book Details (Right Side) */}
-                                <div className="flex flex-col">
-                                    <CardTitle>{book.title}</CardTitle>
-                                    <p className="text-gray-600 text-sm mt-1">{book.description}</p>
+                                    {/* Book Details (Right Side) */}
+                                    <div className="flex flex-col">
+                                        <CardTitle>{book.title}</CardTitle>
+                                        <p className="text-gray-600 text-sm mt-1">{book.description}</p>
 
-                                    <p className="text-sm text-gray-500 mt-2">{book.author}</p>
-                                    <p className="text-sm text-gray-500">{new Date(book.release_date).toLocaleString("en-US", { month: "long", year: "numeric" })}</p>
-                                    
-                                    <p className="text-base font-semibold mt-2">{book.price.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</p>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                        <p className="text-sm text-gray-500 mt-2">{book.author}</p>
+                                        <p className="text-sm text-gray-500">{new Date(book.release_date).toLocaleString("en-US", { month: "long", year: "numeric" })}</p>
+
+                                        <p className="text-base font-semibold mt-2">{book.price.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</p>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </Link>
                     ))}
                 </div>
