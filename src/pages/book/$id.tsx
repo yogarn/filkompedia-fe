@@ -5,6 +5,8 @@ import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { BookPagePlaceholder } from "../books/bookPlaceholder";
 import { Button } from "@/components/ui/button";
 import CommentSection from "./comments";
+import { toast } from "sonner";
+import { Minus, Plus } from "lucide-react";
 
 interface Book {
     id: string;
@@ -40,7 +42,10 @@ const BookDetail = () => {
     const { id } = useParams<{ id: string }>();
     const { fetchWithAuth } = useAuthFetch();
     const [book, setBook] = useState<Book | null>(null);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [addingToCart, setAddingToCart] = useState(false);
+    const [quantity, setQuantity] = useState(1);
 
     const fetchBook = useCallback(() => {
         fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/${id}`)
@@ -50,9 +55,35 @@ const BookDetail = () => {
             .finally(() => setLoading(false));
     }, [id, fetchWithAuth]);
 
+    const handleAddToCart = async () => {
+        if (!book) return;
+        setAddingToCart(true);
+        try {
+            const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/carts`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ user_id: currentUserId, book_id: book.id, amount: quantity }),
+            });
+            if (!response.ok) throw new Error("Failed to add to cart");
+            toast.info("Item succesfully added to cart.")
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            toast.error("Failed to add to cart.")
+        } finally {
+            setAddingToCart(false);
+        }
+    };
+
     useEffect(() => {
+        fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/me`)
+        .then(res => res.json())
+        .then(data => setCurrentUserId(data.data.id))
+        .catch(err => console.error("Error fetching user:", err));
+
         fetchBook();
-    }, [fetchBook]);
+    }, [fetchBook, fetchWithAuth]);
 
     if (loading) return <p className="text-center text-gray-500">Loading...</p>;
     if (!book) return <p className="text-center text-gray-500">Book not found.</p>;
@@ -88,8 +119,16 @@ const BookDetail = () => {
                                 {book.price.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
                             </p>
                             <div className="flex gap-4">
-                                <Button className="px-6 py-2 bg-gray-500 text-white">Add to Cart</Button>
-                                <Button className="px-6 py-2 bg-gray-800 text-white">Buy Now</Button>
+                                <div className="flex items-center border border-gray-300 rounded-md px-2 py-1">
+                                    <button onClick={() => setQuantity(prev => Math.max(1, prev - 1))} className="p-2"><Minus size={16} /></button>
+                                    <span className="px-4 text-lg font-semibold">{quantity}</span>
+                                    <button onClick={() => setQuantity(prev => prev + 1)} className="p-2"><Plus size={16} /></button>
+                                </div>
+                                <Button className="h-auto px-6 py-2 bg-gray-500 text-white" onClick={handleAddToCart} disabled={addingToCart}>
+                                    {addingToCart ? "Adding..." : "Add to Cart"}
+                                </Button>
+                                <Button className="h-auto px-6 py-2 bg-gray-800 text-white">Buy Now</Button>
+
                             </div>
                         </div>
                     </div>
