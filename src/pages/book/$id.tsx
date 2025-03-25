@@ -144,7 +144,7 @@ const BookDetail = () => {
                                         <button onClick={() => setQuantity(prev => prev + 1)} className="p-2"><Plus size={16} /></button>
                                     </div>
                                     <Button className="h-auto px-6 py-2 bg-gray-500 text-white" onClick={handleAddToCart} disabled={addingToCart}>
-                                        {addingToCart ? "Adding..." : "Add to Cart"}
+                                        Add to cart
                                     </Button>
                                     <Button className="h-auto px-6 py-2 bg-gray-800 text-white">Buy Now</Button>
 
