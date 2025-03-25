@@ -19,3 +19,14 @@ export const BookPagePlaceholder = ({ title, author }: { title: string; author: 
     </div>
   );
 };
+
+
+export const BookCartPlaceholder = ({ title }: { title: string }) => {
+  return (
+    <div className="w-24 h-32 object-cover rounded-lg flex items-center justify-center bg-gray-200 border border-gray-300">
+      <div className="text-center px-2">
+        <div className="text-sm font-semibold text-gray-800">{title}</div>
+      </div>
+    </div>
+  );
+};
