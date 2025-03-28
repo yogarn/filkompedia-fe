@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +23,7 @@ export default function BookCreate() {
     const { fetchWithAuth } = useAuthFetch();
     const [book, setBook] = useState<Book | null>(null);
     const [priceInput, setPriceInput] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -39,6 +40,7 @@ export default function BookCreate() {
                 throw new Error(errorData.message || "Failed to add book.");
             }
 
+            navigate("/admin/books")
             toast.info("Successfully add book details.")
         } catch (err: any) {
             console.error(err)
