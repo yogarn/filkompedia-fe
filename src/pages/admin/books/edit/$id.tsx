@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,12 +24,17 @@ export default function BookEdit() {
     const { fetchWithAuth } = useAuthFetch();
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const [priceInput, setPriceInput] = useState("");
 
     const fetchBook = useCallback(async () => {
         try {
             const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/${id}`);
             const data = await res.json();
-            if (res.ok) setBook(data.data);
+            if (res.ok) {
+                setBook(data.data);
+                setPriceInput(new Intl.NumberFormat("id-ID").format(data.data.price));
+            }
             else setBook(null)
         } catch (err) {
             console.error("Error fetching book:", err);
@@ -53,10 +58,33 @@ export default function BookEdit() {
                 throw new Error(errorData.message || "Failed to save book.");
             }
 
+            navigate("/admin/books")
             toast.info("Successfully save book details.")
         } catch (err: any) {
             console.error(err)
             toast.error("Failed to save book.");
+        }
+    };
+
+    const handleDelete = async (e: any) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/${id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || "Failed to delete book.");
+            }
+
+            navigate("/admin/books");
+            toast.info("successfully deleted book.")
+        } catch (err: any) {
+            console.error(err)
+            toast.error("Failed to delete book.");
         }
     };
 
@@ -96,23 +124,23 @@ export default function BookEdit() {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Description</label>
-                            <Input
-                                type="text"
+                            <textarea
                                 placeholder="Description"
                                 value={book?.description || ""}
                                 onChange={(e) => setBook((prev) => ({ ...prev!, description: e.target.value }))}
-                                className="border border-gray-300"
+                                rows={3}
+                                className="border border-gray-300 w-full p-2 rounded-md"
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Introduction</label>
-                            <Input
-                                type="text"
+                            <textarea
                                 placeholder="Introduction"
                                 value={book?.introduction || ""}
                                 onChange={(e) => setBook((prev) => ({ ...prev!, introduction: e.target.value }))}
-                                className="border border-gray-300"
+                                rows={8}
+                                className="border border-gray-300 w-full p-2 rounded-md"
                             />
                         </div>
 
@@ -164,10 +192,11 @@ export default function BookEdit() {
                             <Input
                                 type="text"
                                 placeholder="Price (Rp)"
-                                value={book?.price ? new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(book.price) : ""}
+                                value={priceInput}
                                 onChange={(e) => {
-                                    const numericValue = Number(e.target.value.replace(/\D/g, "")); // Remove non-numeric chars
-                                    setBook((prev) => ({ ...prev!, price: numericValue }));
+                                    const rawValue = e.target.value.replace(/\D/g, "");
+                                    setPriceInput(rawValue ? new Intl.NumberFormat("id-ID").format(Number(rawValue)) : "");
+                                    setBook((prev) => ({ ...prev!, price: Number(rawValue) }));
                                 }}
                                 className="border border-gray-300"
                             />
@@ -182,6 +211,13 @@ export default function BookEdit() {
                             </Link>
                             <Button type="submit" className="w-full bg-black text-white hover:bg-gray-900">
                                 Save
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={handleDelete}
+                                className="w-full bg-red-600 text-white hover:bg-red-700"
+                            >
+                                Delete
                             </Button>
                         </div>
                     </form>
