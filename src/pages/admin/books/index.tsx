@@ -98,6 +98,17 @@ export default function BookList() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+                    {page === 1 ? (
+                        <Link to={`/admin/books/create`} className="no-underline">
+                            <Card className="shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg h-full">
+                                <CardContent className="flex flex-col justify-center items-center h-full">
+                                    <CardTitle>Create Book</CardTitle>
+                                    <p className="text-gray-600 text-sm mt-1 text-center">Click here to add or create a new book to sell.</p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ) : <></>}
+
                     {books?.map((book) => (
                         <Link to={`/admin/books/edit/${book.id}`} key={book.id} className="no-underline">
                             <Card className="shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
