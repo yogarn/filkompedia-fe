@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { Link } from "react-router-dom";
-import { BookPlaceholder } from "./bookPlaceholder";
-import { NavBar } from "@/navbar";
+import { BookPlaceholder } from "@/pages/books/bookPlaceholder";
+import { AdminNavBar } from "@/navbar";
 
 interface Book {
     id: string;
@@ -21,14 +21,13 @@ interface Book {
 }
 
 export default function BookList() {
-    const { fetchWithAuth, authChecking } = useAuthFetch();
+    const { fetchWithAuth } = useAuthFetch();
 
     const [books, setBooks] = useState<Book[] | null>(null);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(9);
     const [hasMore, setHasMore] = useState(true);
-    const [loading, setLoading] = useState(true);
 
     const fetchBooks = useCallback(() => {
         const apiUrl = `${import.meta.env.VITE_API_URL}/books?search=${search}&page=${page}&size=${pageSize}`;
@@ -47,9 +46,6 @@ export default function BookList() {
             .catch((err) => {
                 console.error("Error fetching books:", err);
                 setBooks([]);
-            })
-            .finally(() => {
-                setLoading(false);
             });
     }, [search, page, pageSize, fetchWithAuth]);
 
@@ -79,12 +75,10 @@ export default function BookList() {
         fetchBooks();
     }, [fetchBooks]);
 
-    if (authChecking || loading) return <p className="text-center text-gray-500"></p>;
-
     return (
         <div className="flex flex-col items-center p-6 space-y-4 w-full">
-            <NavBar />
-            <h1 className="text-2xl font-bold">FilkomPedia</h1>
+            <AdminNavBar />
+            <h1 className="text-2xl font-bold">Manage FilkomPedia Books</h1>
 
             {/* Search Input and Button */}
             <div className="flex space-x-2 w-full max-w-md">
@@ -105,7 +99,7 @@ export default function BookList() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
                     {books?.map((book) => (
-                        <Link to={`/book/${book.id}`} key={book.id} className="no-underline">
+                        <Link to={`/admin/books/edit/${book.id}`} key={book.id} className="no-underline">
                             <Card className="shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
                                 <CardContent className="flex items-start space-x-4">
                                     {/* Book Image (Left Side) */}

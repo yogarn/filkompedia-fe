@@ -14,7 +14,7 @@ interface RequireRoleProps {
 }
 
 const RequireRole = ({ allowedRole, children }: RequireRoleProps) => {
-    const { fetchWithAuth } = useAuthFetch();
+    const { fetchWithAuth, authChecking } = useAuthFetch();
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -28,7 +28,7 @@ const RequireRole = ({ allowedRole, children }: RequireRoleProps) => {
             .finally(() => setLoading(false));
     }, [fetchWithAuth]);
 
-    if (loading) {
+    if (authChecking || loading) {
         return <p className="text-center"></p>;
     }
 

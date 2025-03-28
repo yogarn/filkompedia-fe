@@ -38,14 +38,21 @@ export function AdminNavBar() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link to="/books">
+                    <Link to="/admin">
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            Dashboard
+                        </NavigationMenuLink>
+                    </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <Link to="/admin/books">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Manage Books
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link to="/carts">
+                    <Link to="/admin/users">
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             Manage Users
                         </NavigationMenuLink>

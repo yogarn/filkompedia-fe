@@ -1,12 +1,15 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 let refreshPromise: Promise<void> | null = null;
 
 export function useAuthFetch() {
     const navigate = useNavigate();
+    const [authChecking, setAuthChecking] = useState(true);
 
     const fetchWithAuth = useCallback(async (url: string, options: RequestInit = {}, retry = true) => {
+        setAuthChecking(true);
+
         const response = await fetch(url, {
             ...options,
             credentials: "include",
@@ -19,7 +22,7 @@ export function useAuthFetch() {
                     credentials: "include",
                 }).then(res => {
                     if (!res.ok) {
-                        navigate("/login")
+                        navigate("/login");
                         throw new Error("Refresh failed");
                     }
                     return res.json();
@@ -32,8 +35,9 @@ export function useAuthFetch() {
             return await fetchWithAuth(url, options, false);
         }
 
+        setAuthChecking(false);
         return response;
     }, [navigate]);
 
-    return { fetchWithAuth };
+    return { fetchWithAuth, authChecking };
 }
