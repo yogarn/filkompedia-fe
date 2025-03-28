@@ -7,6 +7,7 @@ import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { Link } from "react-router-dom";
 import { BookPlaceholder } from "./bookPlaceholder";
 import { NavBar } from "@/navbar";
+import truncateText from "@/props/truncater";
 
 interface Book {
     id: string;
@@ -119,7 +120,7 @@ export default function BookList() {
                                     {/* Book Details (Right Side) */}
                                     <div className="flex flex-col">
                                         <CardTitle>{book.title}</CardTitle>
-                                        <p className="text-gray-600 text-sm mt-1">{book.description}</p>
+                                        <p className="text-gray-600 text-sm mt-1">{truncateText(book.description, 100)}</p>
 
                                         <p className="text-sm text-gray-500 mt-2">{book.author}</p>
                                         <p className="text-sm text-gray-500">{new Date(book.release_date).toLocaleString("en-US", { month: "long", year: "numeric" })}</p>
