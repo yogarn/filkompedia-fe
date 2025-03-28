@@ -21,8 +21,26 @@ interface Book {
     price: number;
 }
 
+const BookImage = ({ src, title, author }: { src: string, title: string; author: string }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    return (
+        <div className="relative w-32 h-48 border border-gray-300 rounded-lg shadow-md flex-shrink-0">
+            {!imageLoaded && <BookPlaceholder title={title} author={author} />}
+            <img
+                src={src}
+                alt={title}
+                className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
+                    }`}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(false)}
+            />
+        </div>
+    );
+};
+
 export default function BookList() {
-    const { fetchWithAuth, authChecking } = useAuthFetch();
+    const { fetchWithAuth } = useAuthFetch();
 
     const [books, setBooks] = useState<Book[] | null>(null);
     const [search, setSearch] = useState("");
@@ -54,24 +72,6 @@ export default function BookList() {
             });
     }, [search, page, pageSize, fetchWithAuth]);
 
-    const BookImage = ({ src, title, author }: { src: string, title: string; author: string }) => {
-        const [imageLoaded, setImageLoaded] = useState(false);
-
-        return (
-            <div className="relative w-32 h-48 border border-gray-300 rounded-lg shadow-md flex-shrink-0">
-                {!imageLoaded && <BookPlaceholder title={title} author={author} />}
-                <img
-                    src={src}
-                    alt={title}
-                    className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
-                        }`}
-                    onLoad={() => setImageLoaded(true)}
-                    onError={() => setImageLoaded(false)}
-                />
-            </div>
-        );
-    };
-
     useEffect(() => {
         setPage(1)
     }, [search])
@@ -80,7 +80,7 @@ export default function BookList() {
         fetchBooks();
     }, [fetchBooks]);
 
-    if (authChecking || loading) return <p className="text-center text-gray-500"></p>;
+    if (loading) return <p></p>;
 
     return (
         <div className="flex flex-col items-center p-6 space-y-4 w-full">
