@@ -32,3 +32,26 @@ export function NavBar() {
         </NavigationMenu>
     );
 }
+
+export function AdminNavBar() {
+    return (
+        <NavigationMenu>
+            <NavigationMenuList>
+                <NavigationMenuItem>
+                    <Link to="/books">
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            Manage Books
+                        </NavigationMenuLink>
+                    </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <Link to="/carts">
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            Manage Users
+                        </NavigationMenuLink>
+                    </Link>
+                </NavigationMenuItem>
+            </NavigationMenuList>
+        </NavigationMenu>
+    );
+}
