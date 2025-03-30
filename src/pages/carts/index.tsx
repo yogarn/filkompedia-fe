@@ -6,6 +6,7 @@ import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { BookCartPlaceholder } from "../books/bookPlaceholder";
+import { useNavigate } from "react-router-dom";
 
 interface CartItem {
     id: number;
@@ -40,6 +41,7 @@ const BookImage = ({ src, title }: { src: string, title: string; author: string 
 };
 
 const CartsPage = () => {
+    const navigate = useNavigate();
     const { fetchWithAuth } = useAuthFetch();
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -97,6 +99,33 @@ const CartsPage = () => {
         }
     };
 
+    const checkout = async () => {
+        const carts_id = cartItems.map(item => item.id);
+        
+        try {
+            const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/checkouts/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ carts_id })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            window.open(data.data.redirect_url, "_blank");
+            // change later to payments list page
+            navigate("/books");
+            toast.info("Succesfully checkouts cart");
+        } catch (error) {
+            console.error("Error during checkout:", error);
+            toast.error("Failed to checkout the carts.")
+        }
+    };    
+
     const toggleSelect = (id: number) => {
         setSelectedItems((prev) => ({ ...prev, [id]: !prev[id] }));
     };
@@ -147,7 +176,7 @@ const CartsPage = () => {
             {cartItems.length > 0 && (
                 <div className="fixed bottom-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center">
                     <p className="text-lg font-bold">Total: {totalCost.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</p>
-                    <Button disabled={totalCost === 0} className="bg-green-400 text-white px-6 py-2 rounded-lg hover:bg-green-500">Checkout</Button>
+                    <Button disabled={totalCost === 0} className="bg-green-400 text-white px-6 py-2 rounded-lg hover:bg-green-500" onClick={() => checkout()}>Checkout</Button>
                 </div>
             )}
         </div>
