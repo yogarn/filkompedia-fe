@@ -74,13 +74,43 @@ const CartsPage = () => {
         fetchCartItems();
     }, [fetchWithAuth]);
 
-    const updateQuantity = (id: any, delta: any) => {
+    const updateQuantity = async (id: number, delta: number) => {
         setCartItems((prevItems) =>
             prevItems.map((item) =>
                 item.id === id ? { ...item, amount: Math.max(1, item.amount + delta) } : item
             )
         );
-    };
+    
+        try {
+            const item = cartItems.find(item => item.id === id);
+            if (!item) {
+                throw new Error("Cart item not found.");
+            }
+
+            if (Math.max(1, item.amount + delta) == 1) {
+                toast.error("Couldn't update quantity less than one, try remove the cart instead!");
+                return
+            }
+
+            const cart_id = item.id;
+            const amount = Math.max(1, item.amount + delta)
+
+            const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/carts`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({cart_id, amount})
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to update cart quantity.");
+            }
+    
+            toast.success("Cart quantity updated successfully.");
+        } catch (error) {
+            toast.error("Failed to update cart quantity.");
+            console.error("Error updating cart:", error);
+        }
+    };    
 
     const removeItem = async (id: number) => {
         try {
