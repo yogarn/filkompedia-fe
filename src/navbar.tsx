@@ -15,18 +15,19 @@ export function NavBar() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link to="/books">
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            Books
-                        </NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link to="/books">Books</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link to="/carts">
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                            Cart
-                        </NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link to="/carts">Cart</Link>
+                    </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link to="/checkouts">Checkouts</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
@@ -39,21 +40,21 @@ export function AdminNavBar() {
             <NavigationMenuList>
                 <NavigationMenuItem>
                     <Link to="/admin">
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                             Dashboard
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                     <Link to="/admin/books">
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                             Manage Books
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                     <Link to="/admin/users">
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
                             Manage Users
                         </NavigationMenuLink>
                     </Link>
