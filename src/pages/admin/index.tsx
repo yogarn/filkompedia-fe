@@ -29,6 +29,15 @@ const AdminDashboard = () => {
                                 </CardContent>
                             </Card>
                         </Link>
+
+                        <a href="https://dashboard.sandbox.midtrans.com/beta/transactions" target="_blank" rel="noopener noreferrer" className="no-underline">
+                            <Card className="shadow-md cursor-pointer transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
+                                <CardContent className="space-x-4">
+                                    <CardTitle>Monitor Transactions</CardTitle>
+                                    <p className="text-gray-600 text-sm mt-1">Click here to monitoring transactions. You will be redirected to Midtrans.</p>
+                                </CardContent>
+                            </Card>
+                        </a>
                     </div>
                 </div>
             </div>
