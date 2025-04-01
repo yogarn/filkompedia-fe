@@ -39,25 +39,19 @@ export function AdminNavBar() {
         <NavigationMenu>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <Link to="/admin">
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            Dashboard
-                        </NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link to="/admin">Dashboard</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link to="/admin/books">
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            Manage Books
-                        </NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link to="/admin/books">Manage Books</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <Link to="/admin/users">
-                        <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                            Manage Users
-                        </NavigationMenuLink>
-                    </Link>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link to="/admin/users">Manage Users</Link>
+                    </NavigationMenuLink>
                 </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>

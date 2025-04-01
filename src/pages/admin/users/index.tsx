@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { NavBar } from "@/navbar";
+import { AdminNavBar } from "@/navbar";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import RequireRole from "@/props/requiredRole";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -80,7 +80,7 @@ const UsersPage = () => {
     return (
         <RequireRole allowedRole={1}>
             <div className="flex flex-col items-center p-6 space-y-4 w-full">
-                <NavBar />
+                <AdminNavBar />
                 <h1 className="text-2xl font-bold">Manage Users</h1>
                 {Users.length === 0 ? (
                     <p className="text-gray-500 text-center">No users available</p>
