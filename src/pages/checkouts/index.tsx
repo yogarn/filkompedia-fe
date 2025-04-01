@@ -8,6 +8,9 @@ interface Checkout {
     id: string;
     user_id: string;
     books: CheckoutBook[];
+    total_price?: number;
+    status_id?: number;
+    token?: string;
 }
 
 interface CheckoutBook {
@@ -24,6 +27,13 @@ interface CheckoutBook {
         image: string;
     };
 }
+
+const handlePaymentRedirect = (paymentsId?: string) => {
+    if (paymentsId) {
+        window.open(`https://app.sandbox.midtrans.com/snap/v4/redirection/${paymentsId}#/payment-list`, "_blank");
+    }
+};
+
 
 const BookImage = ({ src, title }: { src: string, title: string }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
@@ -51,19 +61,24 @@ const CheckoutsPage = () => {
             try {
                 const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/checkouts/user`);
                 const checkoutData = await response.json();
-                
+
+                const paymentsResponse = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/payments/user`);
+                const paymentsData = await paymentsResponse.json();
+
                 const checkoutPromises = checkoutData.data.map(async (checkout: any) => {
                     const booksResponse = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/checkouts/${checkout.id}`);
                     const booksData = await booksResponse.json();
-                    
+
                     const bookDetailsPromises = booksData.data.map(async (item: any) => {
                         const bookResponse = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/${item.book_id}`);
                         const bookData = await bookResponse.json();
                         return { ...item, book: bookData.data };
                     });
-                    
+
                     const booksWithDetails = await Promise.all(bookDetailsPromises);
-                    return { ...checkout, books: booksWithDetails };
+                    const payment = paymentsData.data.find((p: any) => p.checkout_id === checkout.id);
+
+                    return { ...checkout, books: booksWithDetails, total_price: payment?.total_price, status_id: payment?.status_id, token: payment?.token };
                 });
 
                 const checkoutsWithBooks = await Promise.all(checkoutPromises);
@@ -91,7 +106,23 @@ const CheckoutsPage = () => {
                     {checkouts.map((checkout) => (
                         <Card key={checkout.id} className="shadow-md">
                             <CardContent className="space-y-4">
-                                <CardTitle>Checkout ID: {checkout.id}</CardTitle>
+                                <CardTitle>
+                                    <div className="flex items-center space-x-2">
+                                        {checkout.status_id != 1 ? (
+                                            <button
+                                                className="px-3 py-1 text-sm font-semibold rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition"
+                                                onClick={() => handlePaymentRedirect(checkout.token)}
+                                            >
+                                                Waiting for Payment
+                                            </button>
+                                        ) : (
+                                            <span className="px-3 py-1 text-sm font-semibold rounded-lg bg-green-500 text-white">
+                                                Success
+                                            </span>
+                                        )}
+                                    </div>
+                                </CardTitle>
+
                                 {checkout.books.map((bookItem) => (
                                     <div key={bookItem.id} className="flex items-start space-x-4 border-t pt-4">
                                         {bookItem.book.image ? (
@@ -107,6 +138,7 @@ const CheckoutsPage = () => {
                                         </div>
                                     </div>
                                 ))}
+                                <p className="text-lg font-bold text-left border-t pt-4">Total: {checkout.total_price?.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</p>
                             </CardContent>
                         </Card>
                     ))}

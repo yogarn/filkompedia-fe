@@ -148,7 +148,7 @@ const CartsPage = () => {
             const data = await response.json();
             window.open(data.data.redirect_url, "_blank");
             // change later to payments list page
-            navigate("/books");
+            navigate("/checkouts");
             toast.info("Succesfully checkouts cart");
         } catch (error) {
             console.error("Error during checkout:", error);

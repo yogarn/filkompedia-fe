@@ -24,6 +24,7 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [editingComment, setEditingComment] = useState<Comment | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [hasPurchased, setHasPurchased] = useState(false);
 
     const fetchComments = useCallback(() => {
         fetchWithAuth(`${import.meta.env.VITE_API_URL}/comments/book/${bookId}`)
@@ -38,8 +39,13 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
             .then(data => setCurrentUserId(data.data.id))
             .catch(err => console.error("Error fetching user:", err));
 
+        fetchWithAuth(`${import.meta.env.VITE_API_URL}/payments/book/${bookId}`)
+            .then(res => res.json())
+            .then(data => setHasPurchased(data.data))
+            .catch(err => console.error("Error checking purchase status:", err));
+
         fetchComments();
-    }, [fetchWithAuth, fetchComments]);
+    }, [fetchWithAuth, fetchComments, bookId]);
 
     const submitComment = async () => {
         if (newComment.length < 5) {
@@ -114,16 +120,17 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
             <h2 className="text-xl font-semibold mb-4">Comments & Reviews</h2>
 
             <Textarea
-                placeholder="Write a comment..."
+                placeholder={hasPurchased ? "Write a comment..." : "You must buy this book first before giving a comment."}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 className="mb-4"
                 minLength={5}
                 required
+                disabled={!hasPurchased}
             />
 
             <div className="flex items-center gap-4 mb-6">
-                <Select value={rating} onValueChange={setRating}>
+                <Select value={rating} onValueChange={setRating} disabled={!hasPurchased}>
                     <SelectTrigger className="w-20">
                         <SelectValue placeholder="Rating" />
                     </SelectTrigger>
@@ -135,10 +142,8 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
                         ))}
                     </SelectContent>
                 </Select>
-
-                <Button onClick={submitComment} className="ml-auto">Submit</Button>
+                <Button onClick={submitComment} className="ml-auto" disabled={!hasPurchased}>Submit</Button>
             </div>
-
 
             <div className="space-y-4">
                 {comments.length === 0 ? (
