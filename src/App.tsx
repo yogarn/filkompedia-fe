@@ -5,6 +5,7 @@ import {
   ActionFunction,
 } from "react-router-dom";
 import { Toaster } from "sonner";
+import ErrorPage from "./pages/error";
 
 interface RouteCommon {
   loader?: LoaderFunction;
@@ -49,7 +50,7 @@ const router = createBrowserRouter(
   routes.map(({ Element, ErrorBoundary, ...rest }) => ({
     ...rest,
     element: <Element />,
-    ...(ErrorBoundary && { errorElement: <ErrorBoundary /> }),
+    errorElement: ErrorBoundary ? <ErrorBoundary /> : <ErrorPage />,
   }))
 );
 
