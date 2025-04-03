@@ -87,7 +87,7 @@ const CartsPage = () => {
                 throw new Error("Cart item not found.");
             }
 
-            if (Math.max(1, item.amount + delta) == 1) {
+            if ((item.amount + delta) < 1) {
                 toast.error("Couldn't update quantity less than one, try remove the cart instead!");
                 return
             }
