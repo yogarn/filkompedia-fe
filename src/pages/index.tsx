@@ -1,11 +1,14 @@
-import { Button } from "@/components/ui/button"
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function App() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
-    </div>
-  )
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/login");
+  }, [navigate]);
+
+  return null;
 }
 
-export default App
+export default App;
