@@ -25,13 +25,13 @@ export default function LoginForm() {
 
       if (response.status === 201) {
         await axios.post(`${import.meta.env.VITE_API_URL}/auths/send-otp`, { email });
+        navigate(`/verify-otp?email=${encodeURIComponent(email)}`);
       }
     } catch (err: any) {
       console.log(err);
       toast.error(err.response?.data?.message || "Register failed.");
     } finally {
       setLoading(false);
-      navigate(`/verify-otp?email=${encodeURIComponent(email)}`);
     }
   };
 

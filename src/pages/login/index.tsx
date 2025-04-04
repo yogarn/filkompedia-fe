@@ -24,9 +24,15 @@ export default function LoginForm() {
       if (response.status === 200) {
         navigate("/books");
       }
+
     } catch (err: any) {
-      console.log(err);
-      toast.error(err.response?.data?.message || "Login failed.");
+      if (err.response?.status === 403) {
+        navigate(`/verify-otp?email=${email}`);
+        toast.info("Account not verified, please verify your email.");
+      } else {
+        console.log(err);
+        toast.error(err.response?.data?.message || "Login failed.");
+      }
     }
   };
 
