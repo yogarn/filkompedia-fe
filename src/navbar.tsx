@@ -49,6 +49,11 @@ export function NavBar() {
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
+                    <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                        <Link to="/profile">Account</Link>
+                    </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
                     <button onClick={logout} className={navigationMenuTriggerStyle()}>
                         Logout
                     </button>
