@@ -27,6 +27,7 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
     const [editingComment, setEditingComment] = useState<Comment | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [hasPurchased, setHasPurchased] = useState(false);
+    const [roleId, setRoleId] = useState(0);
 
     const fetchComments = useCallback(() => {
         fetchWithAuth(`${import.meta.env.VITE_API_URL}/comments/book/${bookId}`)
@@ -38,7 +39,11 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
     useEffect(() => {
         fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/me`)
             .then(res => res.json())
-            .then(data => setCurrentUserId(data.data.id))
+            .then(data => {
+                setCurrentUserId(data.data.id);
+                setRoleId(data.data.roleId);
+            }
+            )
             .catch(err => console.error("Error fetching user:", err));
 
         fetchWithAuth(`${import.meta.env.VITE_API_URL}/payments/book/${bookId}`)
@@ -154,8 +159,8 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
                     comments.map(comment => (
                         <div key={comment.id} className="p-4 bg-white rounded-lg shadow-md">
                             <div className="flex items-center space-x-3">
-                                <Avatar className="w-12 h-12">
-                                    <AvatarImage src={comment.profilePicture} />
+                                <Avatar className="w-12 h-12 overflow-hidden">
+                                    <AvatarImage src={comment.profilePicture} className="w-full h-full object-cover" />
                                     <AvatarFallback>AV</AvatarFallback>
                                 </Avatar>
 
@@ -168,8 +173,8 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
                             <p className="mt-2">{comment.comment}</p>
                             <p className="text-sm text-gray-600">Rating: {comment.rating}/5</p>
 
-                            {comment.user_id === currentUserId && (
-                                <div className="mt-2 flex gap-2">
+                            <div className="mt-2 flex gap-2">
+                                {comment.user_id === currentUserId && (
                                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                         <DialogTrigger asChild>
                                             <Button onClick={() => {
@@ -219,9 +224,13 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
 
                                         </DialogContent>
                                     </Dialog>
-                                    <Button className="bg-red-500 text-white" onClick={() => deleteComment(comment.id)}>Delete</Button>
-                                </div>
-                            )}
+                                )}
+                                {(comment.user_id === currentUserId || roleId == 1) && (
+                                    <Button className="bg-red-500 text-white" onClick={() => deleteComment(comment.id)}>
+                                        Delete
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     ))
                 )}
