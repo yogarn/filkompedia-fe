@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Link } from "react-router-dom";
 
 interface Comment {
     id: string;
@@ -165,7 +166,9 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
                                 </Avatar>
 
                                 <div>
-                                    <p className="text-gray-800 font-semibold">{comment.username}</p>
+                                    <Link to={`/profile/${comment.user_id}`} className="text-gray-800 font-semibold hover:underline">
+                                        {comment.username}
+                                    </Link>
                                     <p className="text-sm text-gray-500">{new Date(comment.created_at).toLocaleString()}</p>
                                 </div>
                             </div>

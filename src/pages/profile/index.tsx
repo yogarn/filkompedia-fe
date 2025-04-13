@@ -12,6 +12,9 @@ export default function ProfileEdit() {
     const [id, setId] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+    const [roleId, setRoleId] = useState<number | null>(null);
+    const [email, setEmail] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const fetchProfile = useCallback(async () => {
@@ -22,6 +25,8 @@ export default function ProfileEdit() {
                 setUsername(data.data.username);
                 setId(data.data.id);
                 setProfilePicture(data.data.profilePicture);
+                setRoleId(data.data.roleId);
+                setEmail(data.data.email);
             } else {
                 setUsername(null);
                 throw new Error("Failed to fetch profile");
@@ -142,6 +147,28 @@ export default function ProfileEdit() {
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
+                            <label className="block text-sm font-medium text-gray-700">User Id</label>
+                            <Input
+                                type="text"
+                                placeholder="User Id"
+                                value={id || ""}
+                                className="border border-gray-300"
+                                disabled
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Email</label>
+                            <Input
+                                type="text"
+                                placeholder="Email"
+                                value={email || ""}
+                                className="border border-gray-300"
+                                disabled
+                            />
+                        </div>
+
+                        <div>
                             <label className="block text-sm font-medium text-gray-700">Username</label>
                             <Input
                                 type="text"
@@ -165,6 +192,17 @@ export default function ProfileEdit() {
                                     className="border border-gray-300"
                                 />
                             </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Role</label>
+                            <Input
+                                type="text"
+                                placeholder="Email"
+                                value={roleId ? (roleId === 1 ? "Admin" : "User") : ""}
+                                className="border border-gray-300"
+                                disabled
+                            />
                         </div>
 
                         <div className="flex flex-col space-y-2">
