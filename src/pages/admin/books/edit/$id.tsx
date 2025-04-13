@@ -15,7 +15,6 @@ interface Book {
     author: string;
     release_date: string;
     image: string;
-    file: string;
     price: number;
 }
 
@@ -85,6 +84,37 @@ export default function BookEdit() {
         } catch (err: any) {
             console.error(err)
             toast.error("Failed to delete book.");
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            toast.error("No file selected.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/books/cover`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to upload image.");
+            }
+
+            setBook((prev) => ({ ...prev!, image: data.data }));
+
+            toast.success("File uploaded successfully.");
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            toast.error(err.message || "Failed to upload image.");
         }
     };
 
@@ -166,23 +196,27 @@ export default function BookEdit() {
                         </div>
 
                         <div>
+                            <label className="block text-sm font-medium text-gray-700">Upload Image</label>
+                            {book?.image && (
+                                <img src={book?.image} alt="Profile" className="w-24 h-24 object-cover" />
+                            )}
+                            <div className="flex space-x-2">
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileUpload}
+                                    className="border border-gray-300"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
                             <label className="block text-sm font-medium text-gray-700">Image URL</label>
                             <Input
                                 type="text"
                                 placeholder="Image URL"
                                 value={book?.image || ""}
                                 onChange={(e) => setBook((prev) => ({ ...prev!, image: e.target.value }))}
-                                className="border border-gray-300"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">File URL</label>
-                            <Input
-                                type="text"
-                                placeholder="File URL"
-                                value={book?.file || ""}
-                                onChange={(e) => setBook((prev) => ({ ...prev!, file: e.target.value }))}
                                 className="border border-gray-300"
                             />
                         </div>

@@ -18,7 +18,6 @@ interface Book {
     author: string;
     release_date: string;
     image: string;
-    file: string;
     price: number;
 }
 
