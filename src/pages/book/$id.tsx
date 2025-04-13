@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { BookPagePlaceholder } from "../books/bookPlaceholder";
@@ -40,6 +40,7 @@ const BookImage = ({ src, title, author }: { src: string, title: string; author:
 };
 
 const BookDetail = () => {
+    const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { fetchWithAuth } = useAuthFetch();
     const [book, setBook] = useState<Book | null>(null);
@@ -81,6 +82,11 @@ const BookDetail = () => {
             setAddingToCart(false);
         }
     };
+
+    const handleBuy = async () => {
+        handleAddToCart();
+        navigate("/carts");
+    }
 
     useEffect(() => {
         fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/me`)
@@ -146,7 +152,7 @@ const BookDetail = () => {
                                     <Button className="h-auto px-6 py-2 bg-gray-500 text-white" onClick={handleAddToCart} disabled={addingToCart}>
                                         Add to cart
                                     </Button>
-                                    <Button className="h-auto px-6 py-2 bg-gray-800 text-white">Buy Now</Button>
+                                    <Button className="h-auto px-6 py-2 bg-gray-800 text-white" onClick={handleBuy} disabled={addingToCart}>Buy Now</Button>
 
                                 </div>
                             </div>
