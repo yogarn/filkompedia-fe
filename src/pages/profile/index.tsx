@@ -11,6 +11,7 @@ export default function ProfileEdit() {
     const [loading, setLoading] = useState(true);
     const [id, setId] = useState<string | null>(null);
     const [username, setUsername] = useState<string | null>(null);
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const fetchProfile = useCallback(async () => {
@@ -20,6 +21,7 @@ export default function ProfileEdit() {
             if (res.ok) {
                 setUsername(data.data.username);
                 setId(data.data.id);
+                setProfilePicture(data.data.profilePicture);
             } else {
                 setUsername(null);
                 throw new Error("Failed to fetch profile");
@@ -44,7 +46,7 @@ export default function ProfileEdit() {
             const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username }),
+                body: JSON.stringify({ username, profilePicture }),
             });
 
             if (!response.ok) {
@@ -87,6 +89,36 @@ export default function ProfileEdit() {
         }
     };
 
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) {
+            toast.error("No file selected.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/picture`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to upload image.");
+            }
+
+            setProfilePicture(data.data);
+            toast.success("File uploaded successfully.");
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            toast.error(err.message || "Failed to upload image.");
+        }
+    };
+
     useEffect(() => {
         fetchProfile();
     }, [fetchProfile]);
@@ -118,6 +150,21 @@ export default function ProfileEdit() {
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="border border-gray-300"
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+                            {profilePicture && (
+                                <img src={profilePicture} alt="Profile" className="w-24 h-24 object-cover" />
+                            )}
+                            <div className="flex space-x-2">
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileUpload}
+                                    className="border border-gray-300"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex flex-col space-y-2">
