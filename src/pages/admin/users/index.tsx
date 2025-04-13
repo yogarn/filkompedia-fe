@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface User {
-    id: number;
+    id: string;
     username: string;
     email: string;
     roleId: number;
@@ -46,7 +46,7 @@ const UsersPage = () => {
         fetchUsers();
     }, [fetchWithAuth, page, pageSize]);
 
-    const handleRoleChange = async (userId: number, newRoleId: number) => {
+    const handleRoleChange = async (userId: string, newRoleId: number) => {
         try {
             const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/role`, {
                 method: "PUT",
@@ -75,6 +75,34 @@ const UsersPage = () => {
         }
     };
 
+    const handleDelete = async (userId: string) => {
+        try {
+            if (userId === "00000000-0000-0000-0000-000000000000") {
+                toast.error("Can't delete template user.");
+                return;
+            }
+
+            const response = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/users/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.ok) {
+                setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+                toast.info("Successfully deleted user.");
+            } else {
+                console.error("Error deleting user");
+                toast.error("Failed to delete user.");
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            toast.error("Failed to delete user.");
+        }
+    };
+
+
     if (loading) return <p className="text-center text-gray-500"></p>;
 
     return (
@@ -100,7 +128,15 @@ const UsersPage = () => {
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-col items-end">
+                                    <div className="flex flex-row items-center gap-2">
+                                        <Button
+                                            type="button"
+                                            onClick={() => handleDelete(user.id)}
+                                            className="bg-red-600 text-white hover:bg-red-700"
+                                        >
+                                            Delete
+                                        </Button>
+
                                         <Select
                                             value={user.roleId.toString()}
                                             onValueChange={(value) => handleRoleChange(user.id, Number(value))}
@@ -114,6 +150,7 @@ const UsersPage = () => {
                                             </SelectContent>
                                         </Select>
                                     </div>
+
                                 </CardContent>
                             </Card>
                         ))}
