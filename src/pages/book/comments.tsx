@@ -5,11 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuthFetch } from "@/hooks/useAuthFetch";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 
 interface Comment {
     id: string;
     user_id: string;
     username: string;
+    profilePicture: string;
     book_id: string;
     comment: string;
     rating: string;
@@ -151,8 +153,18 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
                 ) : (
                     comments.map(comment => (
                         <div key={comment.id} className="p-4 bg-white rounded-lg shadow-md">
-                            <p className="text-gray-800 font-semibold">{comment.username}</p>
-                            <p className="text-sm text-gray-500">{new Date(comment.created_at).toLocaleString()}</p>
+                            <div className="flex items-center space-x-3">
+                                <Avatar className="w-12 h-12">
+                                    <AvatarImage src={comment.profilePicture} />
+                                    <AvatarFallback>AV</AvatarFallback>
+                                </Avatar>
+
+                                <div>
+                                    <p className="text-gray-800 font-semibold">{comment.username}</p>
+                                    <p className="text-sm text-gray-500">{new Date(comment.created_at).toLocaleString()}</p>
+                                </div>
+                            </div>
+
                             <p className="mt-2">{comment.comment}</p>
                             <p className="text-sm text-gray-600">Rating: {comment.rating}/5</p>
 
