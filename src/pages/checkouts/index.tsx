@@ -108,17 +108,23 @@ const CheckoutsPage = () => {
                             <CardContent className="space-y-4">
                                 <CardTitle>
                                     <div className="flex items-center space-x-2">
-                                        {checkout.status_id != 1 ? (
+                                        {[1, 2, 3].includes(checkout.status_id ?? -1) ? (
+                                            <span
+                                                className={`px-3 py-1 text-sm font-semibold rounded-lg text-white
+      ${checkout.status_id === 1 ? "bg-green-500" : "bg-red-600"}
+    `}
+                                            >
+                                                {checkout.status_id === 1
+                                                    ? "Success"
+                                                    : "Denied or Cancelled"}
+                                            </span>
+                                        ) : (
                                             <button
                                                 className="px-3 py-1 text-sm font-semibold rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition"
                                                 onClick={() => handlePaymentRedirect(checkout.token)}
                                             >
                                                 Waiting for Payment
                                             </button>
-                                        ) : (
-                                            <span className="px-3 py-1 text-sm font-semibold rounded-lg bg-green-500 text-white">
-                                                Success
-                                            </span>
                                         )}
                                     </div>
                                 </CardTitle>
