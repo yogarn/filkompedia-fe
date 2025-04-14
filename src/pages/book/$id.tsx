@@ -84,7 +84,7 @@ const BookDetail = () => {
     };
 
     const handleBuy = async () => {
-        handleAddToCart();
+        await handleAddToCart();
         navigate("/carts");
     }
 
