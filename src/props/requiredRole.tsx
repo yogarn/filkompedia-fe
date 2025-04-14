@@ -32,7 +32,7 @@ const RequireRole = ({ allowedRole, children }: RequireRoleProps) => {
         return <p className="text-center"></p>;
     }
 
-    if (!currentUser || currentUser.roleId !== allowedRole) {
+    if (!currentUser || allowedRole === -1) {
         return (
             <div className="flex flex-col items-center p-6 space-y-4 w-full">
                 <div className="flex justify-center items-center w-full h-full">

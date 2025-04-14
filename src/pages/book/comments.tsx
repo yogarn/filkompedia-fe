@@ -173,7 +173,7 @@ const CommentSection = ({ bookId }: { bookId: string }) => {
                                 </div>
                             </div>
 
-                            <p className="mt-2">{comment.comment}</p>
+                            <p className="mt-2" dangerouslySetInnerHTML={{ __html: comment.comment }} />
                             <p className="text-sm text-gray-600">Rating: {comment.rating}/5</p>
 
                             <div className="mt-2 flex gap-2">
