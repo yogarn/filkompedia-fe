@@ -198,8 +198,8 @@ export default function ProfileEdit() {
                             <label className="block text-sm font-medium text-gray-700">Role</label>
                             <Input
                                 type="text"
-                                placeholder="Email"
-                                value={roleId ? (roleId === 1 ? "Admin" : "User") : ""}
+                                placeholder="Role"
+                                value={roleId === 1 ? "Admin" : "User"}
                                 className="border border-gray-300"
                                 disabled
                             />
